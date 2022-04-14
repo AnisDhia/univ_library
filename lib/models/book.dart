@@ -30,7 +30,7 @@ class Book {
   final int year;
 
   const Book({
-    required this.id,
+    this.id,
     required this.isReserved,
     required this.title,
     required this.author,

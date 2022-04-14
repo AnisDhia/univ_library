@@ -56,7 +56,7 @@ class LibraryDB {
     return book.copy(id: id);
   }
 
-  Future<Book> readNote(int id) async {
+  Future<Book> readBook(int id) async {
     final db = await instance.database;
 
     final maps = await db.query(tableBooks,
@@ -79,6 +79,13 @@ class LibraryDB {
 
     final result = await db.query(tableBooks, orderBy: orderBy);
 
+    return result.map((json) => Book.fromJson(json)).toList();
+  }
+
+  Future<List<Book>> searchBooks(String keyword) async {
+    final db = await instance.database;
+
+    final result = await db.query(tableBooks, where: '${BookFields.title} LIKE ? OR ${BookFields.author} LIKE ?', whereArgs: ['%$keyword%', '%$keyword%']);
     return result.map((json) => Book.fromJson(json)).toList();
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:univ_library/db/library_db.dart';
 import 'package:univ_library/models/book.dart';
+import 'package:univ_library/screens/book_details_screen.dart';
 import 'package:univ_library/widgets/custom_drawer.dart';
 
 class BrowseScreen extends StatefulWidget {
@@ -22,19 +23,19 @@ class _BrowseScreenState extends State<BrowseScreen> {
     refreshBooks();
   }
 
-  @override
-  void dispose() {
-    LibraryDB.instance.close();
+  // @override
+  // void dispose() {
+  //   LibraryDB.instance.close();
 
-    super.dispose();
-  }
+  //   super.dispose();
+  // }
 
   Future refreshBooks() async {
     setState(() {
       isLoading = true;
     });
 
-    this.books = await LibraryDB.instance.readAllBooks();
+    books = await LibraryDB.instance.readAllBooks();
 
     setState(() {
       isLoading = false;
@@ -43,22 +44,34 @@ class _BrowseScreenState extends State<BrowseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // refreshBooks();
     return Scaffold(
-      drawer: NavDrawer(),
+      drawer: const NavDrawer(),
       appBar: AppBar(
         title: const Text('Browse'),
       ),
       body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: books.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text(books[index].title),
-                  subtitle: Text('by ${books[index].author}'),
-                  trailing: Text(books[index].description),
-                );
-              })),
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : ListView.builder(
+                  itemCount: books.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      title: Text(books[index].title),
+                      subtitle: Text('by ${books[index].author}'),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  BookDetailsScreen(bookId: books[index].id!),
+                            ));
+                      },
+                    );
+                  })),
     );
   }
 }

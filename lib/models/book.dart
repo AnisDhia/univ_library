@@ -1,4 +1,4 @@
-final String tableBooks = 'books';
+const String tableBooks = 'books';
 
 class BookFields {
   static final List<String> values = [
@@ -11,7 +11,7 @@ class BookFields {
     isReserved,
   ];
 
-  static const String id = '_id';
+  static const String id = 'book_id';
   static const String isReserved = 'isReserved';
   static const String title = 'title';
   static const String author = 'author';

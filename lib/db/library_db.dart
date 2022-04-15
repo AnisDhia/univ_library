@@ -1,3 +1,7 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:univ_library/models/book.dart';
@@ -20,26 +24,49 @@ class LibraryDB {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    // check if the data base exists
+    var exists = await databaseExists(path);
+
+    if(!exists) {
+      // Should happen only the first time app is laucnhed 
+      log('creating new copy from asset');
+
+      // Make sure the parent dir exists
+      try {
+        await Directory(dirname(path)).create(recursive: true);
+      } catch (_) {}
+
+      // copy from asset
+      ByteData data = await rootBundle.load(join('assets','univ_library.db'));
+      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+
+      // Write and flush the bytes written
+      await File(path).writeAsBytes(bytes, flush: true);
+    } else {
+      log('Opening existing database');
+    }
+
+    return await openDatabase(path, readOnly: true);
+    // return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
-  Future _createDB(Database db, int version) async {
-    final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    final textType = 'TEXT NOT NULL';
-    final boolType = 'BOOLEAN NOT NULL';
-    final integerType = 'INTEGER NOT NULL';
+  // Future _createDB(Database db, int version) async {
+  //   const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+  //   const textType = 'TEXT NOT NULL';
+  //   const boolType = 'BOOLEAN NOT NULL';
+  //   const integerType = 'INTEGER NOT NULL';
 
-    await db.execute('''CREATE TABLE $tableBooks (
-      ${BookFields.id} $idType,
-      ${BookFields.isReserved} $boolType,
-      ${BookFields.author} $textType,
-      ${BookFields.title} $textType,
-      ${BookFields.description} $textType,
-      ${BookFields.category} $textType,
-      ${BookFields.year} $integerType
-    )
-    ''');
-  }
+  //   await db.execute('''CREATE TABLE $tableBooks (
+  //     ${BookFields.id} $idType,
+  //     ${BookFields.isReserved} $boolType,
+  //     ${BookFields.author} $textType,
+  //     ${BookFields.title} $textType,
+  //     ${BookFields.description} $textType,
+  //     ${BookFields.category} $textType,
+  //     ${BookFields.year} $integerType
+  //   )
+  //   ''');
+  // }
 
   Future<Book> create(Book book) async {
     final db = await instance.database;
@@ -56,7 +83,7 @@ class LibraryDB {
     return book.copy(id: id);
   }
 
-  Future<Book> readBook(int id) async {
+  Future<Book> fetchBook(int id) async {
     final db = await instance.database;
 
     final maps = await db.query(tableBooks,
@@ -71,7 +98,7 @@ class LibraryDB {
     }
   }
 
-  Future<List<Book>> readAllBooks() async {
+  Future<List<Book>> fetchAllBooks() async {
     final db = await instance.database;
 
     const orderBy = '${BookFields.title} ASC';
@@ -85,7 +112,19 @@ class LibraryDB {
   Future<List<Book>> searchBooks(String keyword) async {
     final db = await instance.database;
 
-    final result = await db.query(tableBooks, where: '${BookFields.title} LIKE ? OR ${BookFields.author} LIKE ?', whereArgs: ['%$keyword%', '%$keyword%']);
+    final result = await db.query(tableBooks,
+        where:
+            '${BookFields.title} LIKE ? OR ${BookFields.author} LIKE ? OR ${BookFields.category} LIKE ?',
+        whereArgs: ['%$keyword%', '%$keyword%', '%$keyword%']);
+    return result.map((json) => Book.fromJson(json)).toList();
+  }
+
+  Future<List<Book>> fetchBooks(int number) async {
+    final db = await instance.database;
+
+    const orderBy = '${BookFields.title} ASC';
+
+    final result = await db.query(tableBooks, limit: number, orderBy: orderBy);
     return result.map((json) => Book.fromJson(json)).toList();
   }
 

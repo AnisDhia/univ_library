@@ -44,48 +44,50 @@ class _TestScreenState extends State<TestScreen> {
       appBar: AppBar(
         title: const Text('Test'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(label: Text('Title')),
-                validator: (value) {
-                  return value!.isEmpty ? "Required" : null;
-                },
-                autovalidateMode: AutovalidateMode.always,
-              ),
-              TextFormField(
-                controller: _authorController,
-                decoration: const InputDecoration(
-                  label: Text('Author'),
-                ),
-                validator: (value) {
-                  return value!.isEmpty ? "Required" : null;
-                },
-              ),
-              TextFormField(
-                controller: _categoryController,
-                decoration: const InputDecoration(label: Text('Category')),
-              ),
-              TextFormField(
-                maxLines: 3,
-                controller: _descriptionController,
-                decoration: const InputDecoration(label: Text('Description')),
-              ),
-              const SizedBox(
-                height: 14,
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    _addBook(context);
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(label: Text('Title')),
+                  validator: (value) {
+                    return value!.isEmpty ? "Required" : null;
                   },
-                  child: const Text('Add book'))
-            ],
+                  autovalidateMode: AutovalidateMode.always,
+                ),
+                TextFormField(
+                  controller: _authorController,
+                  decoration: const InputDecoration(
+                    label: Text('Author'),
+                  ),
+                  validator: (value) {
+                    return value!.isEmpty ? "Required" : null;
+                  },
+                ),
+                TextFormField(
+                  controller: _categoryController,
+                  decoration: const InputDecoration(label: Text('Category')),
+                ),
+                TextFormField(
+                  maxLines: 3,
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(label: Text('Description')),
+                ),
+                const SizedBox(
+                  height: 14,
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      _addBook(context);
+                    },
+                    child: const Text('Add book'))
+              ],
+            ),
           ),
         ),
       ),

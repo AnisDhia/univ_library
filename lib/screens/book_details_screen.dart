@@ -27,7 +27,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       isLoading = true;
     });
 
-    book = await LibraryDB.instance.readBook(widget.bookId);
+    book = await LibraryDB.instance.fetchBook(widget.bookId);
 
     setState(() {
       isLoading = false;

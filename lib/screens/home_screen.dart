@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:univ_library/db/library_db.dart';
 import 'package:univ_library/models/book.dart';
+import 'package:univ_library/screens/book_details_screen.dart';
 import 'package:univ_library/widgets/bookcard_widget.dart';
-import 'package:univ_library/widgets/books_list.dart';
 import 'package:univ_library/widgets/custom_drawer.dart';
-import 'package:univ_library/widgets/search_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _BrowseScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  // List<Book> books = await LibraryDB.instance.readAllBooks();
-  String query = '';
+class _BrowseScreenState extends State<HomeScreen> {
   final controller = ScrollController();
   List<Book> books = [];
   bool isLoading = false, hasMore = true;
@@ -72,88 +69,37 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // refreshBooks();
     return Scaffold(
-        drawer: const NavDrawer(),
-        appBar: AppBar(
-          title: const Text('Home'),
-          // actions: [
-          //   IconButton(onPressed: () {}, icon: const Icon(Icons.search))
-          // ],
-        ),
-        body: Column(
-          children: [
-            buildSearch(),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: refresh,
-                child: ListView.builder(
-                    itemCount: books.length,
-                    itemBuilder: ((context, index) {
-                      if (index < books.length) {
-                        final book = books[index];
-
-                        return BookCard(book: book);
-                      } else {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 32),
-                          child: Center(
-                            child: hasMore
-                                ? const CircularProgressIndicator()
-                                : const Text('No more results'),
-                          ),
-                        );
-                      }
-                    })),
-              ),
-            ),
-          ],
-        ));
-  }
-
-  Widget buildSearch() => SearchWidget(
-        text: query,
-        hintText: 'Title, author or category Name',
-        onChanged: searchBook,
-      );
-
-  void searchBook(String query) async {
-    final books = await LibraryDB.instance.searchBooks(query);
-
-    setState(() {
-      this.query = query;
-      this.books = books;
-    });
+      drawer: const NavDrawer(),
+      appBar: AppBar(
+        title: const Text('Browse'),
+        // actions: [
+        //   IconButton(onPressed: refreshBooks, icon: const Icon(Icons.refresh)),
+        // ],
+      ),
+      body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: RefreshIndicator(
+            onRefresh: refresh,
+            child: ListView.builder(
+                controller: controller,
+                itemCount: books.length + 1,
+                itemBuilder: (BuildContext context, int index) {
+                  if (index < books.length) {
+                    return BookCard(book: books[index]);
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 32),
+                      child: Center(
+                        child: hasMore
+                            ? const CircularProgressIndicator()
+                            : const Text('No more results'),
+                      ),
+                    );
+                  }
+                }),
+          )),
+    );
   }
 }
-
-// SingleChildScrollView(
-//           child: Center(
-//               child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               Padding(
-//                 padding: const EdgeInsets.all(8.0),
-//                 child: TextField(
-//                   decoration: const InputDecoration(
-//                       border: OutlineInputBorder(), labelText: 'keyword'),
-//                   onChanged: (value) {
-//                     keyword = value;
-//                     setState(() {});
-//                   },
-//                 ),
-//               ),
-//               FutureBuilder(
-//                   future: LibraryDB.instance.searchBooks(keyword),
-//                   builder: (context, snapshot) {
-//                     if (snapshot.hasError) print('error');
-//                     var data = snapshot.data as List<Book>;
-//                     return RefreshIndicator(
-//                         child: ListView.builder(
-//                             itemBuilder: ((context, index) {
-                              
-//                             })),
-//                         onRefresh: refresh);
-//                   })
-//             ],
-//           )),
-//         )

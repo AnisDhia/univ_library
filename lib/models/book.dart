@@ -1,4 +1,4 @@
-const String tableBooks = 'books';
+const String tableBooks = 'notices';
 
 class BookFields {
   static final List<String> values = [
@@ -6,17 +6,17 @@ class BookFields {
     author,
     title,
     year,
-    description,
+    code,
     category,
     isReserved,
   ];
 
-  static const String id = 'book_id';
-  static const String isReserved = 'isReserved';
-  static const String title = 'title';
-  static const String author = 'author';
-  static const String description = 'description';
-  static const String category = 'category';
+  static const String id = 'notice_id';
+  static const String isReserved = 'statut';
+  static const String title = 'tit1';
+  static const String author = 'tit4';
+  static const String code = 'code';
+  static const String category = 'tit2';
   static const String year = 'year';
 }
 
@@ -25,28 +25,28 @@ class Book {
   final bool isReserved;
   final String title;
   final String author;
-  final String description;
+  final String code;
   final String category;
-  final int year;
+  final String year;
 
   const Book({
     this.id,
     required this.isReserved,
     required this.title,
     required this.author,
-    required this.description,
+    required this.code,
     required this.category,
     required this.year,
   });
 
   static Book fromJson(Map<String, Object?> json) => Book(
     id: json[BookFields.id] as int?,
-    isReserved: json[BookFields.isReserved] == 1,
+    isReserved: int.parse(json[BookFields.isReserved].toString()) > 0,
     author: json[BookFields.author] as String,
     title: json[BookFields.title] as String,
-    description: json[BookFields.description] as String,
+    code: json[BookFields.code] as String,
     category: json[BookFields.category] as String,
-    year: json[BookFields.year] as int,
+    year: json[BookFields.year] as String,
     );
 
   Map<String, Object?> toJson() => {
@@ -54,7 +54,7 @@ class Book {
         BookFields.isReserved: isReserved ? 1 : 0,
         BookFields.title: title,
         BookFields.author: author,
-        BookFields.description: description,
+        BookFields.code: code,
         BookFields.category: category,
         BookFields.year: year
       };
@@ -64,15 +64,15 @@ class Book {
           bool? isReserved,
           String? title,
           String? author,
-          String? description,
+          String? code,
           String? category,
-          int? year}) =>
+          String? year}) =>
       Book(
           id: id ?? this.id,
           isReserved: isReserved ?? this.isReserved,
           title: title ?? this.title,
           author: author ?? this.author,
-          description: description ?? this.description,
+          code: code ?? this.code,
           category: category ?? this.category,
           year: year ?? this.year);
 }

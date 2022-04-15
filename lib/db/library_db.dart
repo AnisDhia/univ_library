@@ -23,7 +23,7 @@ class LibraryDB {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-
+    deleteDatabase(path);
     // check if the data base exists
     var exists = await databaseExists(path);
 
@@ -122,9 +122,9 @@ class LibraryDB {
   Future<List<Book>> fetchBooks(int number) async {
     final db = await instance.database;
 
-    const orderBy = '${BookFields.title} ASC';
+    const orderBy = '${BookFields.id} ASC';
 
-    final result = await db.query(tableBooks, limit: number, orderBy: orderBy);
+    final result = await db.query(tableBooks, limit: number, orderBy: orderBy, where: '${BookFields.title} IS NOT NULL');
     return result.map((json) => Book.fromJson(json)).toList();
   }
 

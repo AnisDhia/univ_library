@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:univ_library/db/library_db.dart';
 import 'package:univ_library/widgets/navigation.dart';
 
 void main() {
@@ -13,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Univ Library',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,

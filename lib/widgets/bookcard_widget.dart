@@ -20,7 +20,7 @@ class _BookCardState extends State<BookCard> {
             context,
             MaterialPageRoute(
               builder: (context) => BookDetailsScreen(
-                bookId: widget.book.id ?? -1,
+                book: widget.book,
               ),
             ));
       },

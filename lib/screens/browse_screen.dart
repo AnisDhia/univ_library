@@ -1,21 +1,27 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:univ_library/db/library_db.dart';
 import 'package:univ_library/models/book.dart';
-import 'package:univ_library/screens/book_details_screen.dart';
 import 'package:univ_library/widgets/bookcard_widget.dart';
+import 'package:univ_library/widgets/books_list.dart';
 import 'package:univ_library/widgets/custom_drawer.dart';
+import 'package:univ_library/widgets/search_widget.dart';
 
 class BrowseScreen extends StatefulWidget {
   const BrowseScreen({Key? key}) : super(key: key);
 
   @override
-  State<BrowseScreen> createState() => _BrowseScreenState();
+  State<BrowseScreen> createState() => _HomeScreenState();
 }
 
-class _BrowseScreenState extends State<BrowseScreen> {
+class _HomeScreenState extends State<BrowseScreen> {
+  // List<Book> books = await LibraryDB.instance.readAllBooks();
+  String query = '';
   final controller = ScrollController();
   List<Book> books = [];
   bool isLoading = false, hasMore = true;
+  Timer? debouncer;
 
   @override
   void initState() {
@@ -29,6 +35,24 @@ class _BrowseScreenState extends State<BrowseScreen> {
       }
     });
     // refreshBooks();
+  }
+
+  @override
+  void dispose() {
+    // LibraryDB.instance.close();
+    controller.dispose();
+    debouncer?.cancel();
+
+    super.dispose();
+  }
+
+  void debounce(VoidCallback callback,
+      {Duration duration = const Duration(microseconds: 1000)}) {
+    if (debouncer != null) {
+      debouncer!.cancel();
+    }
+
+    debouncer = Timer(duration, callback);
   }
 
   Future fetch() async {
@@ -49,14 +73,6 @@ class _BrowseScreenState extends State<BrowseScreen> {
     // }
   }
 
-  @override
-  void dispose() {
-    // LibraryDB.instance.close();
-    controller.dispose();
-
-    super.dispose();
-  }
-
   Future refresh() async {
     setState(() {
       isLoading = false;
@@ -69,36 +85,108 @@ class _BrowseScreenState extends State<BrowseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // refreshBooks();
     return Scaffold(
-      drawer: const NavDrawer(),
-      appBar: AppBar(
-        title: const Text('Browse'),
-        // actions: [
-        //   IconButton(onPressed: refreshBooks, icon: const Icon(Icons.refresh)),
-        // ],
-      ),
-      body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: RefreshIndicator(
-            onRefresh: refresh,
-            child: ListView.builder(
-                itemCount: books.length,
-                itemBuilder: (BuildContext context, int index) {
-                  if (index < books.length) {
-                    return BookCard(book: books[index]);
-                  } else {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 32),
-                      child: Center(
-                        child: hasMore
-                            ? const CircularProgressIndicator()
-                            : const Text('No more results'),
-                      ),
-                    );
-                  }
-                }),
-          )),
-    );
+        drawer: const NavDrawer(),
+        appBar: AppBar(
+          title: const Text('Home'),
+          // actions: [
+          //   IconButton(onPressed: () {}, icon: const Icon(Icons.search))
+          // ],
+        ),
+        body: Column(
+          children: [
+            buildSearch(),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: refresh,
+                child: ListView.builder(
+                    controller: controller,
+                    itemCount: books.length + 1,
+                    itemBuilder: ((context, index) {
+                      if (index < books.length) {
+                        final book = books[index];
+
+                        return BookCard(book: book);
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 32),
+                          child: Center(
+                            child: hasMore
+                                ? const CircularProgressIndicator()
+                                : const Text('No more results'),
+                          ),
+                        );
+                      }
+                    })),
+              ),
+            ),
+          ],
+        ));
   }
+
+  Widget buildSearch() => SearchWidget(
+        text: query,
+        hintText: 'Title, author or category Name',
+        onChanged: searchBook,
+      );
+
+  // void searchBook(String query) async {
+  // final books = await LibraryDB.instance.searchBooks(query);
+
+  // if (!mounted) return;
+
+  // setState(() {
+  //   this.query = query;
+  //   this.books = books;
+  // });
+  // }
+  void searchBook(String query) async => debounce(() async {
+        if (query == '') {
+          fetch();
+        } else {
+          final books = await LibraryDB.instance.searchBooks(query);
+          if (!mounted) return;
+
+          setState(() {
+            if (books.length < 15) {
+              hasMore = false;
+            }
+            this.query = query;
+            this.books = books;
+          });
+        }
+      });
 }
+
+// SingleChildScrollView(
+//           child: Center(
+//               child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               Padding(
+//                 padding: const EdgeInsets.all(8.0),
+//                 child: TextField(
+//                   decoration: const InputDecoration(
+//                       border: OutlineInputBorder(), labelText: 'keyword'),
+//                   onChanged: (value) {
+//                     keyword = value;
+//                     setState(() {});
+//                   },
+//                 ),
+//               ),
+//               FutureBuilder(
+//                   future: LibraryDB.instance.searchBooks(keyword),
+//                   builder: (context, snapshot) {
+//                     if (snapshot.hasError) print('error');
+//                     var data = snapshot.data as List<Book>;
+//                     return RefreshIndicator(
+//                         child: ListView.builder(
+//                             itemBuilder: ((context, index) {
+                              
+//                             })),
+//                         onRefresh: refresh);
+//                   })
+//             ],
+//           )),
+//         )
+

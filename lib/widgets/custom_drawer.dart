@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:univ_library/screens/settings_screen.dart';
-import 'package:univ_library/screens/test_screen.dart';
 
 class NavDrawer extends StatefulWidget {
   const NavDrawer({Key? key}) : super(key: key);
@@ -47,17 +46,6 @@ class _NavDrawerState extends State<NavDrawer> {
             onTap: () => {},
           ),
           ListTile(
-            leading: const Icon(Icons.verified_user),
-            title: const Text('Profile'),
-            onTap: () => {
-              Navigator.pop(context),
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (BuildContext context) => const ProfileScreen()))
-            },
-          ),
-          ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
             onTap: () => {
@@ -81,13 +69,7 @@ class _NavDrawerState extends State<NavDrawer> {
               // authenticationCubit.signout()
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.telegram),
-            title: const Text('Testing'),
-            onTap: () => {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const TestScreen(),))
-            },
-          )
+          
         ],
       ),
     );

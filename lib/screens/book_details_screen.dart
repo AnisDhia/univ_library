@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:univ_library/db/library_db.dart';
+import 'package:univ_library/db/preferences.dart';
 import 'package:univ_library/models/book.dart';
+import 'package:univ_library/models/user.dart';
 
 class BookDetailsScreen extends StatefulWidget {
   const BookDetailsScreen({Key? key, required this.book}) : super(key: key);
@@ -12,28 +15,7 @@ class BookDetailsScreen extends StatefulWidget {
 }
 
 class _BookDetailsScreenState extends State<BookDetailsScreen> {
-  // late Book book;
-  // bool isLoading = false;
-
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-
-  //   refreshBook();
-  // }
-
-  // Future refreshBook() async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-
-  //   book = await LibraryDB.instance.fetchBook(widget.bookId);
-
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-  // }
+  bool bookmarked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +23,18 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       appBar: AppBar(
         title: Text(widget.book.title),
         actions: [
-          IconButton(onPressed: () {
-            
-          }, icon: Icon(Icons.bookmark_add_outlined))
+          Consumer<Preferences>(builder: (context, value, child) {
+            return IconButton(
+                onPressed: () async {
+                  // value.toggleBookmark(widget.book.id!);
+                  setState(() {
+                    bookmarked = !bookmarked;
+                  });
+                },
+                icon: Icon(bookmarked
+                    ? Icons.bookmark
+                    : Icons.bookmark_add_outlined));
+          })
           // IconButton(
           //     onPressed: () async {
           //       await LibraryDB.instance.delete(widget.book.id!);

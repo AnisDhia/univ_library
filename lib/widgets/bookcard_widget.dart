@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:univ_library/db/preferences.dart';
 import 'package:univ_library/models/book.dart';
+import 'package:univ_library/models/user.dart';
 import 'package:univ_library/screens/book_details_screen.dart';
 
 class BookCard extends StatefulWidget {
@@ -10,6 +12,8 @@ class BookCard extends StatefulWidget {
 }
 
 class _BookCardState extends State<BookCard> {
+  
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -24,6 +28,7 @@ class _BookCardState extends State<BookCard> {
               ),
             ));
       },
+      trailing: Text(widget.book.status.toString()),
     );
   }
 }

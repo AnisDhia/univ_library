@@ -128,6 +128,15 @@ class LibraryDB {
     return result.map((json) => Book.fromJson(json)).toList();
   }
 
+  Future<List<Book>> fetchBookmarks(List<int> bookmarkIds) async {
+    final List<Book> result = [];
+    for (int id in bookmarkIds) {
+      final book = await fetchBook(id);
+      result.add(book);
+    }
+    return result;
+  }
+
   Future<int> update(Book book) async {
     final db = await instance.database;
 

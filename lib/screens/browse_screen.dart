@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:univ_library/db/library_db.dart';
 import 'package:univ_library/models/book.dart';
 import 'package:univ_library/widgets/bookcard_widget.dart';
-import 'package:univ_library/widgets/books_list.dart';
 import 'package:univ_library/widgets/custom_drawer.dart';
 import 'package:univ_library/widgets/search_widget.dart';
 

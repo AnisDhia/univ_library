@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:univ_library/screens/settings_screen.dart';
+import 'package:univ_library/shared/styles/themes.dart';
 
 class NavDrawer extends StatefulWidget {
   const NavDrawer({Key? key}) : super(key: key);
@@ -69,7 +72,20 @@ class _NavDrawerState extends State<NavDrawer> {
               // authenticationCubit.signout()
             },
           ),
-          
+          ListTile(
+            leading: const Icon(CupertinoIcons.moon_stars),
+            title: const Text('Dark Mode'),
+            trailing: Consumer<ThemeNotifier>(
+              builder: (context, value, child) {
+                return CupertinoSwitch(
+                    value: value.darkTheme,
+                    activeColor: Colors.blue,
+                    onChanged: (newValue) {
+                      value.toggleTheme();
+                    });
+              },
+            ),
+          ),
         ],
       ),
     );
